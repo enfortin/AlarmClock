@@ -17,8 +17,7 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 unsigned long previousMillis;
 const unsigned long interval = 1000;  // 1 second
 
-void
-setup() {
+void setup() {
   Serial.begin(9600);
   irController.begin();
   Serial.setTimeout(100);  // 100ms timeout for serial input
@@ -251,6 +250,7 @@ void loop() {
         minutes1 = constrain(m1, 0, 59);
         lcd.setCursor(0, 0);
         lcd.print("Alarm Set");
+        number_pressed = "";
         break; // nessecary to get out of while loop
       }
     }
@@ -260,6 +260,7 @@ void loop() {
     hours = constrain(h, 0, 23);
     minutes = constrain(m, 0, 59);
     seconds = constrain(s, 0, 59);
+    number_pressed = "";
   }
   if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis > 60000)) { // so alarm does't go off right away (*alarm can never go off in less than a minute)
     digitalWrite(52, LOW);
