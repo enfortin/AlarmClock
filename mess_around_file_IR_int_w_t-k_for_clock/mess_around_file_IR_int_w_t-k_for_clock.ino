@@ -246,6 +246,8 @@ void loop() {
     }
     
     else { // for setting time
+      int h (String(number_pressed[0]) + String(number_pressed[1]).toint();
+      int m (String(number_pressed[0]) + String(number_pressed[1]).toint();
 
     }
   }
