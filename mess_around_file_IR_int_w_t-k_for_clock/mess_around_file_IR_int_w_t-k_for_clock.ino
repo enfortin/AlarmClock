@@ -4,7 +4,7 @@
 #include <LiquidCrystal.h>
 #define IR_RECEIVER_PIN 7 // The Arduino pin connected to IR controller
 
-DIYables_IRcontroller_21 irController(IR_RECEIVER_PIN, 200); // debounce time is 200ms
+DIYables_IRcontroller_21 irController(IR_RECEIVER_PIN, 10); // debounce time is 200ms
 
 //Global Variables
 int pressed = 0;
@@ -261,6 +261,13 @@ void loop() {
     minutes = constrain(m, 0, 59);
     seconds = constrain(s, 0, 59);
     number_pressed = "";
+
+    Serial.println(number_pressed[0]);
+    Serial.print(number_pressed[1]);
+    Serial.print(number_pressed[2]);
+    Serial.print(number_pressed[3]);
+    Serial.print(number_pressed[4]);
+    Serial.println(number_pressed[5]);
   }
   if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis > 60000)) { // so alarm does't go off right away (*alarm can never go off in less than a minute)
     digitalWrite(52, LOW);
