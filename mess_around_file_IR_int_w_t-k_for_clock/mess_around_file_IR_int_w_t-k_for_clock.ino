@@ -12,10 +12,13 @@ String number_pressed = "";
 int mode = 0;
 int hours, minutes, seconds;
 int hours1, minutes1;
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+unsigned long previousMillis;
+const unsigned long interval = 1000;  // 1 second
 
 void
 setup() {
-
   Serial.begin(9600);
   irController.begin();
   Serial.setTimeout(100);  // 100ms timeout for serial input
@@ -32,9 +35,6 @@ setup() {
   digitalWrite(52, HIGH); // defaulting them to off (*this can change depending on model of buzzer)
   digitalWrite(53, LOW);
 }
-
-
-
 
 void loop() {
 
@@ -261,5 +261,14 @@ void loop() {
     minutes = constrain(m, 0, 59);
     seconds = constrain(s, 0, 59);
   }
-
+  if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis > 60000)) { // so alarm does't go off right away (*alarm can never go off in less than a minute)
+    digitalWrite(52, LOW);
+    delayMicroseconds(500);
+    digitalWrite(52, HIGH);
+    delayMicroseconds(500);
+    digitalWrite(53, HIGH);
+    delayMicroseconds(500);
+    digitalWrite(53, LOW);
+    delayMicroseconds(500);
+  }
 }
