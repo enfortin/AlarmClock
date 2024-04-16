@@ -254,18 +254,8 @@ void loop() {
         break; // nessecary to get out of while loop
       }
     }
-    
-    // for setting time
-      int h = (String(number_pressed[0]) + String(number_pressed[1]).toint();
-      int m = (String(number_pressed[0]) + String(number_pressed[1]).toint();
 
-      hours = constrain(h, 0, 23);
-      minutes = constrain(m, 0, 59);
-      seconds = constrain(s, 0, 59);
 
-    }
   }
-
-
 
 }
