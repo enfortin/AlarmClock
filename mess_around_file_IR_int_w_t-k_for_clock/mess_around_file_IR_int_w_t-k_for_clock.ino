@@ -254,8 +254,12 @@ void loop() {
         break; // nessecary to get out of while loop
       }
     }
-
-
+    int h = (String(number_pressed[0]) + String(number_pressed[1])).toInt(); // defining all variables to their correct types
+    int m = (String(number_pressed[2]) + String(number_pressed[3])).toInt();
+    int s = (String(number_pressed[4]) + String(number_pressed[5])).toInt();
+    hours = constrain(h, 0, 23);
+    minutes = constrain(m, 0, 59);
+    seconds = constrain(s, 0, 59);
   }
 
 }
