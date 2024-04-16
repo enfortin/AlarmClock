@@ -237,6 +237,8 @@ void loop() {
   }
 
   if (pressed == 1) {
+    pressed = 0;
+
     while (mode == 1) {
       lcd.setCursor(0, 0);
       lcd.print("Set Alarm hhmm");
@@ -245,13 +247,17 @@ void loop() {
       if (number_pressed == 1) {
         int h1 = (String(number_pressed[0]) + String(number_pressed[1])).toInt();
         int m1 = (String(number_pressed[2]) + String(number_pressed[3])).toInt();
-        hours1 = constrain()
+        hours1 = constrain(h1, 0, 23);
+        minutes1 = constrain(m1, 0, 59);
+        lcd.setCursor(0, 0);
+        lcd.print("Alarm Set");
+        break; // nessecary to get out of while loop
       }
     }
     
-    else { // for setting time
-      int h (String(number_pressed[0]) + String(number_pressed[1]).toint();
-      int m (String(number_pressed[0]) + String(number_pressed[1]).toint();
+    // for setting time
+    int h = (String(number_pressed[0]) + String(number_pressed[1]).toint();
+    int m = (String(number_pressed[0]) + String(number_pressed[1]).toint();
 
     }
   }
