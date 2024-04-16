@@ -255,7 +255,7 @@ void loop() {
 
       hours = constrain(h, 0, 23);
       minutes = constrain(m, 0, 59);
-      seconds = constrain9s, 0, 59);
+      seconds = constrain(s, 0, 59);
 
     }
   }
