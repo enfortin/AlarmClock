@@ -10,6 +10,8 @@ DIYables_IRcontroller_21 irController(IR_RECEIVER_PIN, 200); // debounce time is
 int pressed = 0;
 String number_pressed = "";
 int mode = 0;
+int hours, minutes, seconds;
+int hours1, minutes1;
 
 void
 setup() {
@@ -237,11 +239,13 @@ void loop() {
   if (pressed == 1) {
     while (mode == 1) {
       lcd.setCursor(0, 0);
-      lcd.print("Set Alarm hh:mm");
-      Serial.println("Set Alarm hh:mm");
+      lcd.print("Set Alarm hhmm");
+      Serial.println("Set Alarm hhmm");
 
       if (number_pressed == 1) {
-        int h1 = (String(number_pressed[0]) + String(number_pressed[1]))
+        int h1 = (String(number_pressed[0]) + String(number_pressed[1])).toInt();
+        int m1 = (String(number_pressed[2]) + String(number_pressed[3])).toInt();
+        hours1 = constrain()
       }
     }
     
