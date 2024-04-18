@@ -4,11 +4,11 @@
 #include <LiquidCrystal.h>
 #define IR_RECEIVER_PIN 7 // The Arduino pin connected to IR controller
 
-DIYables_IRcontroller_21 irController(IR_RECEIVER_PIN, 10); // debounce time is 200ms
+DIYables_IRcontroller_21 irController(IR_RECEIVER_PIN, 200); // debounce time is 200ms
 
 //Global Variables
 int pressed = 0;
-String number_pressed = "";
+String number_pressed;
 int mode = 0;
 int hours, minutes, seconds;
 int hours1, minutes1;
@@ -16,7 +16,139 @@ const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 unsigned long previousMillis;
 const unsigned long interval = 1000;  // 1 second
+String h1, h2, m1, m2;
+int h3, m3;
+int count = 0;
 
+
+void IRController() {
+  Key21 key = irController.getKey();
+  if (key != Key21::NONE) {
+
+    switch (key) {
+
+      case Key21::KEY_CH_MINUS:
+        Serial.println("CH-");
+        pressed = 1;
+        break;
+
+      case Key21::KEY_CH:
+        //Serial.println("CH"); // This is the mode button
+        pressed = 1;
+        mode = 1;
+        break;
+
+      case Key21::KEY_CH_PLUS:
+        //Serial.println("CH+"); // This is the mute button
+        pressed = 1;
+        break;
+
+      case Key21::KEY_PREV:
+        Serial.println(">||");
+        // TODO: YOUR CONTROL
+        break;
+
+      case Key21::KEY_NEXT:
+        Serial.println("<<");
+        // TODO: YOUR CONTROL
+        break;
+
+      case Key21::KEY_PLAY_PAUSE:
+        Serial.println(">>");
+        // TODO: YOUR CONTROL
+        break;
+
+      case Key21::KEY_VOL_MINUS:
+        Serial.println("EQ");
+        // TODO: YOUR CONTROL
+        break;
+
+      case Key21::KEY_EQ:
+        Serial.println("+");
+        // TODO: YOUR CONTROL
+        break;
+
+      case Key21::KEY_VOL_PLUS:
+        Serial.println("-");
+        // TODO: YOUR CONTROL
+        break;
+
+      case Key21::KEY_100_PLUS:
+        Serial.println("100+");
+        // TODO: YOUR CONTROL
+        break;
+
+      case Key21::KEY_200_PLUS:
+        Serial.println("200+");
+        // TODO: YOUR CONTROL
+        break;
+
+      case Key21::KEY_0:
+        //Serial.println("0");
+        pressed = 1;
+        number_pressed = "0";
+        break;
+
+      case Key21::KEY_1:
+        //Serial.println("1");
+        pressed = 1;
+        number_pressed = "1";
+        break;
+
+      case Key21::KEY_2:
+        //Serial.println("2");
+        pressed = 1;
+        number_pressed = "2";
+        break;
+
+      case Key21::KEY_3:
+        //Serial.println("3");
+        pressed = 1;
+        number_pressed = "3";
+        break;
+
+      case Key21::KEY_4:
+        //Serial.println("4");
+        pressed = 1;
+        number_pressed = "4";
+        break;
+
+      case Key21::KEY_5:
+        //Serial.println("5");
+        pressed = 1;
+        number_pressed = "5";
+        break;
+
+      case Key21::KEY_6:
+        //Serial.println("6");
+        pressed = 1;
+        number_pressed = "6";
+        break;
+
+      case Key21::KEY_7:
+        //Serial.println("7");
+        pressed = 1;
+        number_pressed = "7";
+        break;
+
+      case Key21::KEY_8:
+        //Serial.println("8");
+        pressed = 1;
+        number_pressed = "8";
+        break;
+
+      case Key21::KEY_9:
+        //Serial.println("9");
+        pressed = 1;
+        number_pressed = "9";
+        break;
+
+      default:
+        Serial.println("WARNING: undefined key:");
+        break;
+    }
+  }
+}
 void setup() {
   Serial.begin(9600);
   irController.begin();
@@ -107,151 +239,57 @@ void loop() {
     Serial.println();
   }
 
-  Key21 key = irController.getKey();
-
-  if (key != Key21::NONE) {
-
-    switch (key) {
-
-      case Key21::KEY_CH_MINUS:
-        Serial.println("CH-");
-        pressed = 1;
-        break;
-
-      case Key21::KEY_CH:
-        Serial.println("CH"); // This is the mode button
-        pressed = 1;
-        mode = 1;
-        break;
-
-      case Key21::KEY_CH_PLUS:
-        Serial.println("CH+"); // This is the mute button
-        pressed = 1;
-        break;
-
-      case Key21::KEY_PREV:
-        Serial.println(">||");
-        // TODO: YOUR CONTROL
-        break;
-
-      case Key21::KEY_NEXT:
-        Serial.println("<<");
-        // TODO: YOUR CONTROL
-        break;
-
-      case Key21::KEY_PLAY_PAUSE:
-        Serial.println(">>");
-        // TODO: YOUR CONTROL
-        break;
-
-      case Key21::KEY_VOL_MINUS:
-        Serial.println("EQ");
-        // TODO: YOUR CONTROL
-        break;
-
-      case Key21::KEY_EQ:
-        Serial.println("+");
-        // TODO: YOUR CONTROL
-        break;
-
-      case Key21::KEY_VOL_PLUS:
-        Serial.println("-");
-        // TODO: YOUR CONTROL
-        break;
-
-      case Key21::KEY_100_PLUS:
-        Serial.println("100+");
-        // TODO: YOUR CONTROL
-        break;
-
-      case Key21::KEY_200_PLUS:
-        Serial.println("200+");
-        // TODO: YOUR CONTROL
-        break;
-
-      case Key21::KEY_0:
-        Serial.println("0");
-        pressed = 1;
-        number_pressed += "0";
-        break;
-
-      case Key21::KEY_1:
-        Serial.println("1");
-        pressed = 1;
-        number_pressed += "1";
-        break;
-
-      case Key21::KEY_2:
-        Serial.println("2");
-        pressed = 1;
-        number_pressed += "2";
-        break;
-
-      case Key21::KEY_3:
-        Serial.println("3");
-        pressed = 1;
-        number_pressed += "3";
-        break;
-
-      case Key21::KEY_4:
-        Serial.println("4");
-        pressed = 1;
-        number_pressed += "4";
-        break;
-
-      case Key21::KEY_5:
-        Serial.println("5");
-        pressed = 1;
-        number_pressed += "5";
-        break;
-
-      case Key21::KEY_6:
-        Serial.println("6");
-        pressed = 1;
-        number_pressed += "6";
-        break;
-
-      case Key21::KEY_7:
-        Serial.println("7");
-        pressed = 1;
-        number_pressed += "7";
-        break;
-
-      case Key21::KEY_8:
-        Serial.println("8");
-        pressed = 1;
-        number_pressed += "8";
-        break;
-
-      case Key21::KEY_9:
-        Serial.println("9");
-        pressed = 1;
-        number_pressed += "9";
-        break;
-
-      default:
-        Serial.println("WARNING: undefined key:");
-        break;
-    }
-  }
+  IRController(); // 
 
   if (pressed == 1) {
-    pressed = 0;
 
     while (mode == 1) {
       lcd.setCursor(0, 0);
-      lcd.print("Set Alarm hhmm");
-      Serial.println("Set Alarm hhmm");
+      lcd.println("Set Alarm hhmm");
+      //Serial.println("Set Alarm hhmm");
 
-      if (number_pressed == 1) {
-        int h1 = (String(number_pressed[0]) + String(number_pressed[1])).toInt();
-        int m1 = (String(number_pressed[2]) + String(number_pressed[3])).toInt();
-        hours1 = constrain(h1, 0, 23);
-        minutes1 = constrain(m1, 0, 59);
-        lcd.setCursor(0, 0);
-        lcd.print("Alarm Set");
-        number_pressed = "";
-        break; // nessecary to get out of while loop
+      // Need a way to get the values for each button press without using break statements. Might have to rewrite code for IR using count instead of case to avoid break statements.
+      // <<Put this code here>>
+      IRController();
+
+      //Serial.println(pressed);
+      //Serial.println(number_pressed);
+      if (pressed == 1) {
+        pressed = 0;
+        count += 1;
+        Serial.print("\t");
+        //Serial.println(count);
+
+        if (count == 2) {
+          h1 = number_pressed;
+        }
+
+        if (count == 3) {
+          h2 = number_pressed;
+          h3 = (String(h1) + String(h2)).toInt();
+          h1 = "";
+          h2 = "";
+          Serial.print(h3);
+        }
+
+        if (count == 4) {
+          m1 = number_pressed;
+        }
+
+        if (count == 5) {
+          m2 = number_pressed;
+          m3 = (String(m1) + String(m2)).toInt();
+          Serial.print(m3);
+          m1 = "";
+          m2 = "";
+          hours1 = constrain(h3, 0, 23);
+          minutes1 = constrain(m3, 0, 59);
+          lcd.setCursor(0, 0);
+          lcd.print("Alarm Set");
+          count = 0;
+          pressed = 0;
+          break; // nessecary to get out of while loop
+        }
       }
     }
     int h = (String(number_pressed[0]) + String(number_pressed[1])).toInt(); // defining all variables to their correct types
@@ -260,14 +298,16 @@ void loop() {
     hours = constrain(h, 0, 23);
     minutes = constrain(m, 0, 59);
     seconds = constrain(s, 0, 59);
-    number_pressed = "";
+    number_pressed = ""; // think about this
 
-    Serial.println(number_pressed[0]);
-    Serial.print(number_pressed[1]);
-    Serial.print(number_pressed[2]);
-    Serial.print(number_pressed[3]);
-    Serial.print(number_pressed[4]);
-    Serial.println(number_pressed[5]);
+    // Serial.println(number_pressed[0]);
+    // Serial.print(number_pressed[1]);
+    // Serial.print(number_pressed[2]);
+    // Serial.print(number_pressed[3]);
+    // Serial.print(number_pressed[4]);
+    // Serial.println(number_pressed[5]);
+    //Serial.println(hours);
+    pressed = 0;
   }
   if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis > 60000)) { // so alarm does't go off right away (*alarm can never go off in less than a minute)
     digitalWrite(52, LOW);
