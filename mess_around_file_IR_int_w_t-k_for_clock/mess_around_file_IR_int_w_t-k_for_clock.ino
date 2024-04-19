@@ -290,9 +290,13 @@ void loop() {
     }
     // Solve the issue with the following code after the above issue.
     count1 += 1;
-    h4 = number_pressed;
     Serial.print("set time count : ");
     Serial.println(count1);
+
+    if (count1 == 1) {
+    h4 = number_pressed;
+    }
+    
     if (count1 == 2) {
       h5 = number_pressed;
       h6 = (String(h4) + String(h5)).toInt();
