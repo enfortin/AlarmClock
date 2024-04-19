@@ -250,8 +250,8 @@ void loop() {
       if (pressed == 1) {
         pressed = 0;
         count += 1;
-        // Serial.print("alarm count : ");
-        // Serial.println(count);
+        Serial.print("alarm count : ");
+        Serial.println(count);
 
         if (count == 2) {
           h1 = number_pressed;
@@ -279,11 +279,11 @@ void loop() {
           lcd.print("Alarm Set");
           count = 0;
           pressed = 0;
-          // Serial.println();
-          // Serial.print("alarm hours : ");
-          // Serial.println(hours1);
-          // Serial.print("alarm minutes : ");
-          // Serial.println(minutes1);
+          Serial.println();
+          Serial.print("alarm hours : ");
+          Serial.println(hours1);
+          Serial.print("alarm minutes : ");
+          Serial.println(minutes1);
           break; // nessecary to get out of while loop
         }
       }
@@ -332,16 +332,8 @@ void loop() {
       Serial.print("set time seconds : ");
       Serial.println(seconds);
     }
-
     number_pressed = ""; // think about this
     pressed = 0;
-    // Serial.println(number_pressed[0]);
-    // Serial.print(number_pressed[1]);
-    // Serial.print(number_pressed[2]);
-    // Serial.print(number_pressed[3]);
-    // Serial.print(number_pressed[4]);
-    // Serial.println(number_pressed[5]);
-    //Serial.println(hours);
   }
   if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis > 60000)) { // so alarm does't go off right away (*alarm can never go off in less than a minute)
     digitalWrite(52, LOW);
