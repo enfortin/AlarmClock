@@ -16,9 +16,9 @@ const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 unsigned long previousMillis;
 const unsigned long interval = 1000;  // 1 second
-String h1, h2, m1, m2;
-int h3, m3;
-int count = 0;
+String h1, h2, h4, h5, m1, m2, m4, m5, s1, s2;
+int h3, h6, m3, m6, s3;
+int count, count1 = 0;
 
 
 void IRController() {
@@ -194,71 +194,64 @@ void loop() {
     // Update the time to the serial monitor and lcd!
     // The format is  hh:mm:ss.
     if (hours < 10) {
-      Serial.print("0");
+      //Serial.print("0");
       lcd.setCursor(0, 1);
       lcd.print("0");
       lcd.setCursor(1, 1);
       lcd.print(hours);
-      Serial.print(hours);
+      //Serial.print(hours);
     } else {
       lcd.setCursor(0, 1);
       lcd.print(hours);
-      Serial.print(hours);
+      //Serial.print(hours);
     }
     lcd.setCursor(0, 1);
-    Serial.print(":");
+    //Serial.print(":");
     lcd.setCursor(2, 1);
     lcd.print(":");
     if (minutes < 10) {
-      Serial.print("0");
+      //Serial.print("0");
       lcd.setCursor(3, 1);
       lcd.print("0");
       lcd.setCursor(4, 1);
       lcd.print(minutes);
-      Serial.print(minutes);
+      //Serial.print(minutes);
     } else {
-      Serial.print(minutes);
+      //Serial.print(minutes);
       lcd.setCursor(3, 1);
       lcd.print(minutes);
     }
-    Serial.print(":");
+    //Serial.print(":");
     lcd.setCursor(5, 1);
     lcd.print(":");
     if (seconds < 10) {
-      Serial.print("0");
+      //Serial.print("0");
       lcd.setCursor(6, 1);
       lcd.print("0");
       lcd.setCursor(7, 1);
       lcd.print(seconds);
-      Serial.print(seconds);
+      //Serial.print(seconds);
     } else {
-      Serial.print(seconds);
+      //Serial.print(seconds);
       lcd.setCursor(6, 1);
       lcd.print(seconds);
     }
-    Serial.println();
+    //Serial.println();
   }
 
-  IRController(); // 
+  IRController();
 
   if (pressed == 1) {
 
     while (mode == 1) {
       lcd.setCursor(0, 0);
       lcd.println("Set Alarm hhmm");
-      //Serial.println("Set Alarm hhmm");
-
-      // Need a way to get the values for each button press without using break statements. Might have to rewrite code for IR using count instead of case to avoid break statements.
-      // <<Put this code here>>
       IRController();
-
-      //Serial.println(pressed);
-      //Serial.println(number_pressed);
       if (pressed == 1) {
         pressed = 0;
         count += 1;
-        Serial.print("\t");
-        //Serial.println(count);
+        // Serial.print("alarm count : ");
+        // Serial.println(count);
 
         if (count == 2) {
           h1 = number_pressed;
@@ -269,7 +262,6 @@ void loop() {
           h3 = (String(h1) + String(h2)).toInt();
           h1 = "";
           h2 = "";
-          Serial.print(h3);
         }
 
         if (count == 4) {
@@ -279,7 +271,6 @@ void loop() {
         if (count == 5) {
           m2 = number_pressed;
           m3 = (String(m1) + String(m2)).toInt();
-          Serial.print(m3);
           m1 = "";
           m2 = "";
           hours1 = constrain(h3, 0, 23);
@@ -288,18 +279,62 @@ void loop() {
           lcd.print("Alarm Set");
           count = 0;
           pressed = 0;
+          // Serial.println();
+          // Serial.print("alarm hours : ");
+          // Serial.println(hours1);
+          // Serial.print("alarm minutes : ");
+          // Serial.println(minutes1);
           break; // nessecary to get out of while loop
         }
       }
     }
-    int h = (String(number_pressed[0]) + String(number_pressed[1])).toInt(); // defining all variables to their correct types
-    int m = (String(number_pressed[2]) + String(number_pressed[3])).toInt();
-    int s = (String(number_pressed[4]) + String(number_pressed[5])).toInt();
-    hours = constrain(h, 0, 23);
-    minutes = constrain(m, 0, 59);
-    seconds = constrain(s, 0, 59);
-    number_pressed = ""; // think about this
+    // Solve the issue with the following code after the above issue.
+    count1 += 1;
+    h4 = number_pressed;
+    Serial.print("set time count : ");
+    Serial.println(count1);
+    if (count1 == 2) {
+      h5 = number_pressed;
+      h6 = (String(h4) + String(h5)).toInt();
+      h4 = "";
+      h5 = "";
+    }
 
+    if (count1 == 3) {
+      m4 = number_pressed;
+    }
+
+    if (count1 == 4) {
+      m5 = number_pressed;
+      m6 = (String(m4) + String(m5)).toInt();
+      m4 = "";
+      m5 = "";
+    }
+
+    if (count1 == 5) {
+      s1 = number_pressed;
+    }
+
+    if (count1 == 6) {
+      s2 = number_pressed;
+      s3 = (String(s1) + String(s2)).toInt();
+      s1 = "";
+      s2 = "";
+      hours = constrain(h6, 0, 23);
+      minutes = constrain(m6, 0, 59);
+      seconds = constrain(s3, 0, 59);
+      count1 = 0;
+      Serial.println();
+      Serial.print("set time hours : ");
+      Serial.println(hours);
+      Serial.print("set time minutes : ");
+      Serial.println(minutes);
+      Serial.print("set time seconds : ");
+      Serial.println(seconds);
+    }
+
+    number_pressed = ""; // think about this
+    pressed = 0;
     // Serial.println(number_pressed[0]);
     // Serial.print(number_pressed[1]);
     // Serial.print(number_pressed[2]);
@@ -307,7 +342,6 @@ void loop() {
     // Serial.print(number_pressed[4]);
     // Serial.println(number_pressed[5]);
     //Serial.println(hours);
-    pressed = 0;
   }
   if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis > 60000)) { // so alarm does't go off right away (*alarm can never go off in less than a minute)
     digitalWrite(52, LOW);
