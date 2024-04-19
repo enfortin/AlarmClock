@@ -9,7 +9,7 @@ DIYables_IRcontroller_21 irController(IR_RECEIVER_PIN, 200); // debounce time is
 //Global Variables
 int pressed = 0;
 String number_pressed;
-int mode = 0;
+int mode, mute = 0;
 int hours, minutes, seconds;
 int hours1, minutes1;
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
@@ -39,8 +39,9 @@ void IRController() {
         break;
 
       case Key21::KEY_CH_PLUS:
-        //Serial.println("CH+"); // This is the mute button
+        Serial.println("mute!"); // This is the mute button
         pressed = 1;
+        mute = 1;
         break;
 
       case Key21::KEY_PREV:
@@ -288,7 +289,7 @@ void loop() {
         }
       }
     }
-    // Solve the issue with the following code after the above issue.
+  
     count1 += 1;
     Serial.print("set time count : ");
     Serial.println(count1);
@@ -348,5 +349,13 @@ void loop() {
     delayMicroseconds(500);
     digitalWrite(53, LOW);
     delayMicroseconds(500);
+
+    IRController(); // testing if this works?!
+
+    if (mute == 1) {
+      digitalWrite(52, HIGH);   // Find out how to make this work?!
+      digitalWrite(53, LOW);
+      mute = 0;
+    }
   }
 }
