@@ -155,27 +155,27 @@ void IRController() {
   }
 }
 void ServoControl() {
-    // Servo Control
-    unsigned long currentMillis1 = millis();  // get the current time
+  // Servo Control
+  unsigned long currentMillis1 = millis();  // get the current time
 
-    // Check if it's time to update the servo position
-    if (currentMillis1 - previousMillis1 >= interval1) {
-      // Save the last time the servo was updated
-      previousMillis1 = currentMillis1;
+  // Check if it's time to update the servo position
+  if (currentMillis1 - previousMillis1 >= interval1) {
+    // Save the last time the servo was updated
+    previousMillis1 = currentMillis1;
 
-      // Move the servo to the next position
-      if (pos <= 180 && pos >= 0) {
-        servo.write(pos);  // control servo to go to position in variable 'pos'
+    // Move the servo to the next position
+    if (pos <= 180 && pos >= 0) {
+      servo.write(pos);  // control servo to go to position in variable 'pos'
 
-        // Increment or decrement position based on direction
-        pos += direction;
+      // Increment or decrement position based on direction
+      pos += direction;
 
-        // Change direction if reaching the extreme positions
-        if (pos <= 0 || pos >= 180) {
-          direction *= -1;
-        }
+      // Change direction if reaching the extreme positions
+      if (pos <= 0 || pos >= 180) {
+        direction *= -1;
       }
     }
+  }
 }
 
 void setup() {
@@ -370,7 +370,10 @@ void loop() {
     number_pressed = ""; // think about this
     pressed = 0;
   }
+
   if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis > 60000)) { // so alarm does't go off right away (*alarm can never go off in less than a minute)
+    
+    
     digitalWrite(52, LOW);
     delayMicroseconds(500);
     digitalWrite(52, HIGH);
@@ -380,9 +383,8 @@ void loop() {
     digitalWrite(53, LOW);
     delayMicroseconds(500);
 
-    IRController(); // testing if this works?!
-
     if (mute == 1) {
+      Serial.print(mute);
       digitalWrite(52, HIGH);   // Find out how to make this work?!
       digitalWrite(53, LOW);
       mute = 0;
