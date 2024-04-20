@@ -1,5 +1,5 @@
 // Use Flag variables for executions for IR_Remote
-
+#include <Servo.h>
 #include <DIYables_IRcontroller.h> // DIYables_IRcontroller library
 #include <LiquidCrystal.h>
 #define IR_RECEIVER_PIN 7 // The Arduino pin connected to IR controller
@@ -19,7 +19,11 @@ const unsigned long interval = 1000;  // 1 second
 String h1, h2, h4, h5, m1, m2, m4, m5, s1, s2;
 int h3, h6, m3, m6, s3;
 int count, count1 = 0;
-
+Servo servo;  // create servo object to control a servo
+unsigned long previousMillis1 = 0;  // store the last time the servo was updated
+const long interval1 = 10;  // interval at which to update the servo (in milliseconds)
+int pos = 0;  // current position of the servo
+int direction = 1;  // direction of rotation (1 for increasing, -1 for decreasing)
 
 void IRController() {
   Key21 key = irController.getKey();
@@ -150,6 +154,30 @@ void IRController() {
     }
   }
 }
+void ServoControl() {
+    // Servo Control
+    unsigned long currentMillis1 = millis();  // get the current time
+
+    // Check if it's time to update the servo position
+    if (currentMillis1 - previousMillis1 >= interval1) {
+      // Save the last time the servo was updated
+      previousMillis1 = currentMillis1;
+
+      // Move the servo to the next position
+      if (pos <= 180 && pos >= 0) {
+        servo.write(pos);  // control servo to go to position in variable 'pos'
+
+        // Increment or decrement position based on direction
+        pos += direction;
+
+        // Change direction if reaching the extreme positions
+        if (pos <= 0 || pos >= 180) {
+          direction *= -1;
+        }
+      }
+    }
+}
+
 void setup() {
   Serial.begin(9600);
   irController.begin();
@@ -166,6 +194,8 @@ void setup() {
   pinMode(53, OUTPUT);
   digitalWrite(52, HIGH); // defaulting them to off (*this can change depending on model of buzzer)
   digitalWrite(53, LOW);
+  servo.attach(9);  // attaches the servo on pin 9 to the servo object
+  servo.write(0);
 }
 
 void loop() {
@@ -239,7 +269,7 @@ void loop() {
     }
     //Serial.println();
   }
-
+  ServoControl();
   IRController();
 
   if (pressed == 1) {
