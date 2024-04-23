@@ -26,6 +26,7 @@ int pos = 0;                        // current position of the servo
 int direction = 1;                  // direction of rotation (1 for increasing, -1 for decreasing)
 bool alarm_off = false;
 String cancel;
+int snooze = 0;
 
 void IRController() {  //Function for the IR controller used from libary.
   delay(10); //Stability
@@ -47,13 +48,14 @@ void IRController() {  //Function for the IR controller used from libary.
         break;
 
       case Key21::KEY_CH_PLUS:
-        Serial.println("mute!");  // This is the mute button
+        // This is the mute button
         // pressed = 1; not nessecary gets rid of potential errors
         mute = 1;
         break;
 
       case Key21::KEY_PREV:
-        Serial.println(">||");
+        //Serial.println(">||"); // this button will snooze for 5 mins! Setting alarm five minutes out!
+        snooze = 1;
         // TODO: YOUR CONTROL
         break;
 
@@ -323,9 +325,10 @@ void loop() {
           minutes1 = constrain(m3, 0, 59);         // constrains minutes through 0-23. Reformats if out of constraints
           lcd.setCursor(0, 0);
           lcd.print("Alarm Set");
-          count = 0;    // reset count to zero
+          count = -1;    // reset count
           pressed = 0;  // reset pressed to zero
           mode = 0;     // reset mode to zero
+          count1 = -1; // nessecary to prevent setting time varaible one
           Serial.println();
           Serial.print("alarm hours : ");
           Serial.println(hours1);
@@ -398,6 +401,47 @@ void loop() {
     digitalWrite(53, LOW);
     delayMicroseconds(500);
     IRController();  // testing if this works?!
+
+    if (snooze == 1) { // snooze feature!
+      Serial.print("SNOOZE");
+      digitalWrite(52, HIGH);  // Turn off
+      digitalWrite(53, LOW);
+
+      if (minutes1 <= 54) {
+        minutes1 += 5; // adds 5 minutes to alarm
+      } 
+
+      else if (minutes1 == 55) {
+        minutes1 = 0;
+        hours1 += 1;
+      }
+
+      else if (minutes1 == 56) {
+        minutes1 = 1;
+        hours1 += 1;
+      }
+
+      else if (minutes1 == 57) {
+        minutes1 = 2;
+        hours += 1;
+      }
+
+      else if (minutes1 == 58) {
+        minutes1 = 3;
+        hours1 += 1;
+      }
+
+      else if (minutes1 == 59) {
+        minutes1 = 4;
+        hours1 += 1;
+      }
+      Serial.print("Snooze hours : ");   // doesn't work for special cases yet need to do some debugging
+      Serial.print(hours1);
+      Serial.print("Snooze minutes : ");
+      Serial.print(minutes1);
+      snooze = 0;
+    }
+
     //Serial.println("Checkpoint");
     if (mute == 1) {
       //Serial.print(mute);
