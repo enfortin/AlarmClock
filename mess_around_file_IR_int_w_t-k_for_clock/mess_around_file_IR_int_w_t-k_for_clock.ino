@@ -25,6 +25,7 @@ const long interval1 = 10;          // interval at which to update the servo (in
 int pos = 0;                        // current position of the servo
 int direction = 1;                  // direction of rotation (1 for increasing, -1 for decreasing)
 bool alarm_off = false;
+String cancel;
 
 void IRController() {  //Function for the IR controller used from libary.
   delay(10); //Stability
@@ -42,6 +43,7 @@ void IRController() {  //Function for the IR controller used from libary.
         //Serial.println("CH"); // This is the mode button
         pressed = 1;
         mode = 1;
+        cancel += 1;
         break;
 
       case Key21::KEY_CH_PLUS:
@@ -282,6 +284,15 @@ void loop() {
       lcd.println("Set Alarm hhmm");  // print set alarm in format hhmm
       alarm_off = false;              // make sure alarm can go off again
       IRController();
+      
+      if (cancel == "11") { // this allows canceling out of alarm set mode by pressing mode again
+        cancel = "";
+        mode = 0;
+        lcd.clear();
+        count1 = -1; // nessecary to prevent setting first variable for time
+        break;
+      }
+
       if (pressed == 1) {  // if pressed == 1
         pressed = 0;       // reset pressed = 0
         count += 1;        // increases the count by 1
