@@ -396,17 +396,17 @@ void loop() {
         Serial.print(hours1);
       }
 
-      else if (minutes1 == 56) {
+      else if (minutes1 == 56) { // works
         minutes1 = 1;
         hours1 += 1;
       }
 
-      else if (minutes1 == 57) { // didn't work
+      else if (minutes1 == 57) { // doesn't work the alarm is instantly muted before snooze press?????????????? pressing mode makes it go off????????????
         minutes1 = 2;
         hours += 1;
       }
 
-      else if (minutes1 == 58) {
+      else if (minutes1 == 58) { // alarm is instantly muted before snooze press??????????????????????????????? pressing mode makes it go off??????????????
         minutes1 = 3;
         hours1 += 1;
       }
@@ -415,7 +415,7 @@ void loop() {
         minutes1 = 4;
         hours1 += 1;
       }
-      Serial.print("Snooze hours : ");   // doesn't work for special cases yet need to do some debugging
+      Serial.print("Snooze hours : ");
       Serial.print(hours1);
       Serial.print("Snooze minutes : ");
       Serial.print(minutes1);
