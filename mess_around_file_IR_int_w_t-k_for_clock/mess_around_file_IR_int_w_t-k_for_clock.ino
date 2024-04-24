@@ -1,5 +1,4 @@
 // Use Flag variables for executions for IR_Remote
-#include <Servo.h>
 #include <DIYables_IRcontroller.h>  // DIYables_IRcontroller library
 #include <LiquidCrystal.h>
 #define IR_RECEIVER_PIN 7  // The Arduino pin connected to IR controller
@@ -19,11 +18,6 @@ const unsigned long interval = 1000;  // 1 second
 String h1, h2, h4, h5, m1, m2, m4, m5, s1, s2;
 int h3, h6, m3, m6, s3;
 int count, count1 = 0;
-Servo servo;                        // create servo object to control a servo
-unsigned long previousMillis1 = 0;  // store the last time the servo was updated
-const long interval1 = 10;          // interval at which to update the servo (in milliseconds)
-int pos = 0;                        // current position of the servo
-int direction = 1;                  // direction of rotation (1 for increasing, -1 for decreasing)
 bool alarm_off = false;
 String cancel;
 int snooze = 0;
@@ -161,30 +155,6 @@ void IRController() {  //Function for the IR controller used from libary.
   }
 }
 
-void ServoControl() {
-  // Servo Control
-  unsigned long currentMillis1 = millis();  // get the current time
-
-  // Check if it's time to update the servo position
-  if (currentMillis1 - previousMillis1 >= interval1) {
-    // Save the last time the servo was updated
-    previousMillis1 = currentMillis1;
-
-    // Move the servo to the next position
-    if (pos <= 180 && pos >= 0) {
-      servo.write(pos);  // control servo to go to position in variable 'pos'
-
-      // Increment or decrement position based on direction
-      pos += direction;
-
-      // Change direction if reaching the extreme positions
-      if (pos <= 0 || pos >= 180) {
-        direction *= -1;
-      }
-    }
-  }
-}
-
 void setup() {
   Serial.begin(9600);
   irController.begin();                           //intializes the IR controller
@@ -201,8 +171,6 @@ void setup() {
   pinMode(53, OUTPUT);
   digitalWrite(52, HIGH);  // defaulting them to off (*this can change depending on model of buzzer)
   digitalWrite(53, LOW);
-  servo.attach(9);  // attaches the servo on pin 9 to the servo object
-  servo.write(0);
 }
 
 void loop() {
@@ -276,9 +244,10 @@ void loop() {
     }
     //Serial.println();
   }
-  ServoControl();      // Call the servo control function
+
   IRController();      // Call the IR control function
-                      //setting the alarm
+  
+  //setting the alarm
   if (pressed == 1) {  // If a button is pressed on the IR remote pressed == 1.
 
     while (mode == 1) {  // if mode button is pressed join the while loop.
@@ -287,11 +256,12 @@ void loop() {
       alarm_off = false;              // make sure alarm can go off again
       IRController();
       
-      if (cancel == "11") { // this allows canceling out of alarm set mode by pressing mode again
+      if ((cancel == "11") || (cancel == "111") || (cancel == "111") || (cancel == "1111") || (cancel == "11111")) { // this allows canceling out of alarm set mode by pressing mode again
         cancel = "";
         mode = 0;
         lcd.clear();
         count1 = -1; // nessecary to prevent setting first variable for time
+        count = 0; // I think this is needed to make the alarm not count up and store variables
         break;
       }
 
@@ -339,7 +309,10 @@ void loop() {
       }
     }
     // setting the clock time
-    count1 += 1;
+    if (mode != 1) { // add this in hopes that it will allow you to switch back a forth between modes with out storing variables
+      count1 += 1;
+      mode = 0;
+    }
     Serial.print("set time count : ");
     Serial.println(count1);
 
@@ -400,7 +373,11 @@ void loop() {
     delayMicroseconds(500);
     digitalWrite(53, LOW);
     delayMicroseconds(500);
-    IRController();  // testing if this works?!
+    IRController(); // calling IR controller function
+
+    // This will be cool LED changing colors on wake up:
+    //////////////////////PUT HERE//////////////////////
+
 
     if (snooze == 1) { // snooze feature!
       Serial.print("SNOOZE");
@@ -411,9 +388,12 @@ void loop() {
         minutes1 += 5; // adds 5 minutes to alarm
       } 
 
-      else if (minutes1 == 55) {
+      else if (minutes1 == 55) {   // works
+        Serial.print("checkpoint");
         minutes1 = 0;
         hours1 += 1;
+        Serial.print(minutes1);
+        Serial.print(hours1);
       }
 
       else if (minutes1 == 56) {
@@ -421,7 +401,7 @@ void loop() {
         hours1 += 1;
       }
 
-      else if (minutes1 == 57) {
+      else if (minutes1 == 57) { // didn't work
         minutes1 = 2;
         hours += 1;
       }
@@ -431,7 +411,7 @@ void loop() {
         hours1 += 1;
       }
 
-      else if (minutes1 == 59) {
+      else if (minutes1 == 59) { // works
         minutes1 = 4;
         hours1 += 1;
       }
