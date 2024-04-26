@@ -18,7 +18,6 @@ int hours1, minutes1;
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 unsigned long previousMillis;
-unsigned long currentMillis;          // made this a global varible should work!!!
 const unsigned long interval = 1000;  // 1 second
 String h1, h2, h4, h5, m1, m2, m4, m5, s1, s2;
 int h3, h6, m3, m6, s3;
@@ -466,6 +465,15 @@ void Alarm_Set() {
         Serial.println(hours1);
         Serial.print("alarm minutes : ");
         Serial.println(minutes1);
+
+        lcd.setCursor(9, 1); // display set alarm to lcd
+        lcd.print("h");
+        lcd.setCursor(10, 1);
+        lcd.print(hours1);
+        lcd.setCursor(13, 1);
+        lcd.print("m");
+        lcd.setCursor(14, 1);
+        lcd.print(minutes1);
         break;  // nessecary to get out of while loop
       }
     }
@@ -530,18 +538,24 @@ void Time_Set() {
 
 void Alarm_Tone() {
   int size = sizeof(durations) / sizeof(int);
-  //to calculate the note duration, take one second divided by the note type.
-  //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-  int duration = 1000 / durations[note];
-  tone(BUZZER_PIN, melody[note], duration);
+  
+  for (int note = 0; note < size; note++) { // needs for loop for song
+    //to calculate the note duration, take one second divided by the note type.
+    //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+    int duration = 1000 / durations[note];
+    tone(BUZZER_PIN, melody[note], duration);
 
-  //to distinguish the notes, set a minimum time between them.
-  //the note's duration + 30% seems to work well:
-  int pauseBetweenNotes = duration * 1.30;
-  delay(pauseBetweenNotes);
-
-  //stop the tone playing:
-  noTone(BUZZER_PIN);
+    //to distinguish the notes, set a minimum time between them.
+    //the note's duration + 30% seems to work well:
+    int pauseBetweenNotes = duration * 1.30;
+    delay(pauseBetweenNotes);
+    
+    //stop the tone playing:
+    noTone(BUZZER_PIN);
+    if (alarm_off) {
+      break;
+    }
+  }
 }
 
 void RGB_Color_Changer() {
@@ -693,8 +707,6 @@ void Snooze() {
 void Mute() {
   if (mute == 1) {
     //Serial.print(mute);
-    // digitalWrite(52, HIGH);  // Find out how to make this work?!
-    // digitalWrite(53, LOW);
     analogWrite(BUZZER_PIN, 0);  // for speaker off
     mute = 0;
     alarm_off = true;                // nessecary to ensure the alarm can't keep going off
@@ -730,7 +742,7 @@ void setup() {
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
+  unsigned long currentMillis1 = millis(); // makes it so condition in second if statement can be evaluated
   IRController();  // Call the IR control function
   Time_Increment_AND_LCD_Format();
 
@@ -739,18 +751,17 @@ void loop() {
     Time_Set();
   }
 
-  // Debug statements to print current time and alarm time
-  //Serial.print("currentMillis: ");
-  //Serial.println(currentMillis);
-  //Serial.print("previousMillis: ");
-  //Serial.println(previousMillis);
-
-
-  if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis > 60000) && (alarm_off == false)) {  // so alarm does't go off right away (*alarm can never go off in less than a minute)
+  if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis1 > 60000) && (alarm_off == false)) {  // so alarm does't go off right away (*alarm can never go off in less than a minute)
+    // unsigned long hold = millis() + 10000;
+    // Serial.println(hold);
+    // Serial.println(millis());
+    // if (millis() >= hold) {
+    //   alarm_off = true;
+    // }
     Alarm_Tone();
     RGB_Color_Changer();
     Snooze();
-    Serial.println("Checkpoint");
+    //Serial.println("Checkpoint");
     // Serial.println(mute);
     Mute();
   } else {
