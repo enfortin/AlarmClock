@@ -431,8 +431,8 @@ void Alarm_Set() {
       count += 1;        // increases the count by 1
       Serial.print("alarm count : ");
       Serial.println(count);
-      lcd.clear(); // this is to clear the alarm each time a new one is set
-      lcd.setCursor(2, 1); // alarm set formating to inform user to what they entered as the alarm in real-time
+      lcd.clear();          // this is to clear the alarm each time a new one is set
+      lcd.setCursor(2, 1);  // alarm set formating to inform user to what they entered as the alarm in real-time
       lcd.print(":");
       lcd.setCursor(5, 1);
       lcd.print(":");
@@ -445,11 +445,11 @@ void Alarm_Set() {
         lcd.print(h1);
       }
 
-      if (count == 3) {                          // when the count = 3
-        h2 = number_pressed;                     // h2 = the second digit for hours = the number pressed
-        lcd.setCursor(0, 1);                     // printing first digit of alarm set
+      if (count == 3) {       // when the count = 3
+        h2 = number_pressed;  // h2 = the second digit for hours = the number pressed
+        lcd.setCursor(0, 1);  // printing first digit of alarm set
         lcd.print(h1);
-        lcd.setCursor(1, 1);                     // printing second digit of alarm set
+        lcd.setCursor(1, 1);  // printing second digit of alarm set
         lcd.print(h2);
         h3 = (String(h1) + String(h2)).toInt();  // adds the two number inputed as strings and convert them to an integer.
       }
@@ -462,19 +462,19 @@ void Alarm_Set() {
         lcd.print(h2);
         lcd.setCursor(3, 1);  // printing thrid digit of alarm set
         lcd.print(m1);
-        h1 = "";              // Resets h1 to an empty string.
-        h2 = "";              // Resets h2 to an empty string.
+        h1 = "";  // Resets h1 to an empty string.
+        h2 = "";  // Resets h2 to an empty string.
       }
 
-      if (count == 5) {                          // when count = 5
-        m2 = number_pressed;                     // m2 = the number pressed. Stores as a varible
-        lcd.setCursor(0, 1);                     // printing first digit of alarm set
+      if (count == 5) {       // when count = 5
+        m2 = number_pressed;  // m2 = the number pressed. Stores as a varible
+        lcd.setCursor(0, 1);  // printing first digit of alarm set
         lcd.print(h1);
-        lcd.setCursor(1, 1);                     // printing second digit of alarm set
+        lcd.setCursor(1, 1);  // printing second digit of alarm set
         lcd.print(h2);
-        lcd.setCursor(3, 1);                     // printing thrid digit of alarm set
+        lcd.setCursor(3, 1);  // printing thrid digit of alarm set
         lcd.print(m1);
-        lcd.setCursor(4, 1);                     // printing fourth digit of alarm set
+        lcd.setCursor(4, 1);  // printing fourth digit of alarm set
         lcd.print(m2);
         m3 = (String(m1) + String(m2)).toInt();  // adds the two number inputed as strings and convert them to an integer
         m1 = "";                                 // resets to an empty string
@@ -493,7 +493,7 @@ void Alarm_Set() {
         Serial.print("alarm minutes : ");
         Serial.println(minutes1);
 
-        lcd.setCursor(9, 1); // display set alarm to lcd
+        lcd.setCursor(9, 1);  // display set alarm to lcd
         lcd.print("h");
         lcd.setCursor(10, 1);
         lcd.print(hours1);
@@ -565,8 +565,138 @@ void Time_Set() {
 
 void Alarm_Tone() {
   int size = sizeof(durations) / sizeof(int);
-  
-  for (int note = 0; note < size; note++) { // needs for loop for song
+
+  for (int note = 0; note < size && (mute != 1); note++) {  // needs for loop for song
+    // IRController();
+    delay(10);  //Stability
+    Key21 key = irController.getKey();
+    if (key != Key21::NONE) {
+
+      switch (key) {
+
+        case Key21::KEY_CH_MINUS:
+          Serial.println("CH-");
+          pressed = 1;
+          break;
+
+        case Key21::KEY_CH:
+          //Serial.println("CH"); // This is the mode button
+          pressed = 1;
+          mode = 1;
+          cancel += 1;
+          break;
+
+        case Key21::KEY_CH_PLUS:
+          // This is the mute button
+          Serial.print("IR works: mute");
+          // pressed = 1; not nessecary gets rid of potential errors
+          mute = 1;
+          break;
+
+        case Key21::KEY_PREV:
+          //Serial.println(">||"); // this button will snooze for 5 mins! Setting alarm five minutes out!
+          Serial.print("IR works");
+          snooze = 1;
+          break;
+
+        case Key21::KEY_NEXT:
+          Serial.println("<<");
+          break;
+
+        case Key21::KEY_PLAY_PAUSE:
+          Serial.println(">>");
+          break;
+
+        case Key21::KEY_VOL_MINUS:
+          Serial.println("EQ");
+          break;
+
+        case Key21::KEY_EQ:
+          Serial.println("+");
+          break;
+
+        case Key21::KEY_VOL_PLUS:
+          Serial.println("-");
+          break;
+
+        case Key21::KEY_100_PLUS:
+          Serial.println("100+");
+          break;
+
+        case Key21::KEY_200_PLUS:
+          Serial.println("200+");
+          break;
+
+        case Key21::KEY_0:
+          //Serial.println("0");
+          pressed = 1;
+          number_pressed = "0";
+          break;
+
+        case Key21::KEY_1:
+          //Serial.println("1");
+          pressed = 1;
+          number_pressed = "1";
+          break;
+
+        case Key21::KEY_2:
+          //Serial.println("2");
+          pressed = 1;
+          number_pressed = "2";
+          break;
+
+        case Key21::KEY_3:
+          //Serial.println("3");
+          pressed = 1;
+          number_pressed = "3";
+          break;
+
+        case Key21::KEY_4:
+          //Serial.println("4");
+          pressed = 1;
+          number_pressed = "4";
+          break;
+
+        case Key21::KEY_5:
+          //Serial.println("5");
+          pressed = 1;
+          number_pressed = "5";
+          break;
+
+        case Key21::KEY_6:
+          //Serial.println("6");
+          pressed = 1;
+          number_pressed = "6";
+          break;
+
+        case Key21::KEY_7:
+          //Serial.println("7");
+          pressed = 1;
+          number_pressed = "7";
+          break;
+
+        case Key21::KEY_8:
+          //Serial.println("8");
+          pressed = 1;
+          number_pressed = "8";
+          break;
+
+        case Key21::KEY_9:
+          //Serial.println("9");
+          pressed = 1;
+          number_pressed = "9";
+          break;
+
+        default:
+          Serial.println("WARNING: undefined key:");
+          break;
+      }
+    }
+    Serial.println("Checkpoint");
+    Serial.print(mute);
+    if (mute == 1) {
+      break;
+    }
     //to calculate the note duration, take one second divided by the note type.
     //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
     int duration = 1000 / durations[note];
@@ -576,12 +706,9 @@ void Alarm_Tone() {
     //the note's duration + 30% seems to work well:
     int pauseBetweenNotes = duration * 1.30;
     delay(pauseBetweenNotes);
-    
+
     //stop the tone playing:
     noTone(BUZZER_PIN);
-    if (alarm_off) {
-      break;
-    }
   }
 }
 
@@ -769,8 +896,8 @@ void setup() {
 }
 
 void loop() {
-  unsigned long currentMillis1 = millis(); // makes it so condition in second if statement can be evaluated
-  IRController();  // Call the IR control function
+  unsigned long currentMillis1 = millis();  // makes it so condition in second if statement can be evaluated
+  IRController();                           // Call the IR control function
   Time_Increment_AND_LCD_Format();
 
   if (pressed == 1) {  // If a button is pressed on the IR remote pressed == 1.
@@ -778,7 +905,7 @@ void loop() {
     Time_Set();
   }
 
-  if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis1 > 60000) && (alarm_off == false)) {  // so alarm does't go off right away (*alarm can never go off in less than a minute)
+  if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis1 > 0) && (alarm_off == false)) {  // change 0 back to 60000 // so alarm does't go off right away (*alarm can never go off in less than a minute)
     // unsigned long hold = millis() + 10000;
     // Serial.println(hold);
     // Serial.println(millis());
