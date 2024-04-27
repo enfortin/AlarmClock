@@ -2,6 +2,7 @@
 #include <DIYables_IRcontroller.h>  // DIYables_IRcontroller library
 #include <LiquidCrystal.h>
 #include "pitches.h"
+#include <NewTone.h>
 #define REST 0
 #define BUZZER_PIN 9
 #define IR_RECEIVER_PIN 7  // The Arduino pin connected to IR controller
@@ -570,8 +571,12 @@ void Alarm_Tone() {
     // IRController();
     delay(10);  //Stability
     Key21 key = irController.getKey();
+    Serial.println("Checked Key");
+    if(key == Key21::KEY_CH_PLUS){
+      Serial.println("Muted");
+    }
     if (key != Key21::NONE) {
-
+      delay(10);
       switch (key) {
 
         case Key21::KEY_CH_MINUS:
@@ -700,7 +705,7 @@ void Alarm_Tone() {
     //to calculate the note duration, take one second divided by the note type.
     //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
     int duration = 1000 / durations[note];
-    tone(BUZZER_PIN, melody[note], duration);
+    NewTone(BUZZER_PIN, melody[note], duration);
 
     //to distinguish the notes, set a minimum time between them.
     //the note's duration + 30% seems to work well:
@@ -708,7 +713,7 @@ void Alarm_Tone() {
     delay(pauseBetweenNotes);
 
     //stop the tone playing:
-    noTone(BUZZER_PIN);
+    noNewTone(BUZZER_PIN);
   }
 }
 
@@ -905,7 +910,7 @@ void loop() {
     Time_Set();
   }
 
-  if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis1 > 0) && (alarm_off == false)) {  // change 0 back to 60000 // so alarm does't go off right away (*alarm can never go off in less than a minute)
+  if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis1 > 60000) && (alarm_off == false)) {  // change 0 back to 60000 // so alarm does't go off right away (*alarm can never go off in less than a minute)
     // unsigned long hold = millis() + 10000;
     // Serial.println(hold);
     // Serial.println(millis());
