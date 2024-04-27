@@ -417,7 +417,7 @@ void Alarm_Set() {
     lcd.println("Set Alarm hhmm");  // print set alarm in format hhmm
     alarm_off = false;              // make sure alarm can go off again
 
-    if ((cancel == "11") || (cancel == "111") || (cancel == "111") || (cancel == "1111") || (cancel == "11111")) {  // this allows canceling out of alarm set mode by pressing mode again
+    if (cancel == "11") {  // this allows canceling out of alarm set mode by pressing mode again
       cancel = "";
       mode = 0;
       lcd.clear();
