@@ -431,24 +431,51 @@ void Alarm_Set() {
       count += 1;        // increases the count by 1
       Serial.print("alarm count : ");
       Serial.println(count);
+      lcd.clear(); // this is to clear the alarm each time a new one is set
+      lcd.setCursor(2, 1); // alarm set formating to inform user to what they entered as the alarm in real-time
+      lcd.print(":");
+      lcd.setCursor(5, 1);
+      lcd.print(":");
+      lcd.setCursor(6, 1);
+      lcd.print("00");
 
       if (count == 2) {       // when the count = 2
         h1 = number_pressed;  // h1 = the first digit for the hours = the number pressed
+        lcd.setCursor(0, 1);  // printing first digit of alarm set
+        lcd.print(h1);
       }
 
       if (count == 3) {                          // when the count = 3
         h2 = number_pressed;                     // h2 = the second digit for hours = the number pressed
+        lcd.setCursor(0, 1);                     // printing first digit of alarm set
+        lcd.print(h1);
+        lcd.setCursor(1, 1);                     // printing second digit of alarm set
+        lcd.print(h2);
         h3 = (String(h1) + String(h2)).toInt();  // adds the two number inputed as strings and convert them to an integer.
-        h1 = "";                                 // Resets h1 to an empty string.
-        h2 = "";                                 // Resets h2 to an empty string.
       }
 
       if (count == 4) {       // when count = 4
         m1 = number_pressed;  // m1 = the number pressed. Stores as a varible
+        lcd.setCursor(0, 1);  // printing first digit of alarm set
+        lcd.print(h1);
+        lcd.setCursor(1, 1);  // printing second digit of alarm set
+        lcd.print(h2);
+        lcd.setCursor(3, 1);  // printing thrid digit of alarm set
+        lcd.print(m1);
+        h1 = "";              // Resets h1 to an empty string.
+        h2 = "";              // Resets h2 to an empty string.
       }
 
       if (count == 5) {                          // when count = 5
         m2 = number_pressed;                     // m2 = the number pressed. Stores as a varible
+        lcd.setCursor(0, 1);                     // printing first digit of alarm set
+        lcd.print(h1);
+        lcd.setCursor(1, 1);                     // printing second digit of alarm set
+        lcd.print(h2);
+        lcd.setCursor(3, 1);                     // printing thrid digit of alarm set
+        lcd.print(m1);
+        lcd.setCursor(4, 1);                     // printing fourth digit of alarm set
+        lcd.print(m2);
         m3 = (String(m1) + String(m2)).toInt();  // adds the two number inputed as strings and convert them to an integer
         m1 = "";                                 // resets to an empty string
         m2 = "";                                 // resets to an empty string
