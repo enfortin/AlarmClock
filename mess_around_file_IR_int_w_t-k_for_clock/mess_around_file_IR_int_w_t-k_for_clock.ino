@@ -413,23 +413,25 @@ void Time_Increment_AND_LCD_Format() {
 void Alarm_Set() {
 
   while (mode == 1) {  // if mode button is pressed join the while loop.
+
     IRController();    // So it can work to set alarm
     lcd.setCursor(0, 0);
     lcd.println("Set Alarm hhmm");  // print set alarm in format hhmm
     alarm_off = false;              // make sure alarm can go off again
-    Serial.print(cancel);
+
     if ((cancel >= "11")) {  // this allows canceling out of alarm set mode by pressing mode again
-      Serial.print("check");
       cancel = "";
       mode = 0;
       lcd.clear();
       count1 = -1;  // nessecary to prevent setting first variable for time
       count = 0;    // I think this is needed to make the alarm not count up and store variables
-      Serial.print("Just broke out hahaha");
+      alarm_off = true; // so alarm can't go off after pressing the mute button
+      lcd.setCursor(0, 0);
+      lcd.print("timeset");
       break;
     }
 
-    if (pressed == 1) {  // if pressed == 1
+    else if (pressed == 1) {  // if pressed == 1
       pressed = 0;       // reset pressed = 0
       count += 1;  // increases the count by 1
       Serial.print("alarm count : ");
