@@ -480,6 +480,7 @@ void Alarm_Set() {
   }
 }
 
+<<<<<<< Updated upstream
 void Time_Set() {
   // setting the clock time
   if (mode != 1) {  // add this in hopes that it will allow you to switch back a forth between modes with out storing variables
@@ -540,6 +541,19 @@ void Alarm_Tone() {
   int size = sizeof(durations) / sizeof(int);
   
   for (int note = 0; note < size; note++) { // needs for loop for song
+=======
+    // digitalWrite(52, LOW);
+    // delayMicroseconds(500);
+    // digitalWrite(52, HIGH);
+    // delayMicroseconds(500);
+    // digitalWrite(53, HIGH);
+    // delayMicroseconds(500);
+    // digitalWrite(53, LOW);
+    // delayMicroseconds(500);
+    // IRController(); // calling IR controller function
+    int size = sizeof(durations) / sizeof(int);
+    for (int note = 0; note < size; note++) {
+>>>>>>> Stashed changes
     //to calculate the note duration, take one second divided by the note type.
     //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
     int duration = 1000 / durations[note];
@@ -552,8 +566,74 @@ void Alarm_Tone() {
     
     //stop the tone playing:
     noTone(BUZZER_PIN);
+<<<<<<< Updated upstream
     if (alarm_off) {
       break;
+=======
+
+
+    }
+
+    // This will be cool LED changing colors on wake up:
+    //////////////////////PUT HERE//////////////////////
+
+
+    if (snooze == 1) { // snooze feature!
+      Serial.print("SNOOZE");
+      digitalWrite(52, HIGH);  // Turn off
+      digitalWrite(53, LOW);
+
+      if (minutes1 <= 54) {
+        minutes1 += 5; // adds 5 minutes to alarm
+      } 
+
+      else if (minutes1 == 55) {   // works
+        Serial.print("checkpoint");
+        minutes1 = 0;
+        hours1 += 1;
+        Serial.print(minutes1);
+        Serial.print(hours1);
+      }
+
+      else if (minutes1 == 56) { // works
+        minutes1 = 1;
+        hours1 += 1;
+      }
+
+      else if (minutes1 == 57) { // doesn't work the alarm is instantly muted before snooze press?????????????? pressing mode makes it go off????????????
+        minutes1 = 2;
+        hours += 1;
+      }
+
+      else if (minutes1 == 58) { // alarm is instantly muted before snooze press??????????????????????????????? pressing mode makes it go off??????????????
+        minutes1 = 3;
+        hours1 += 1;
+      }
+
+      else if (minutes1 == 59) { // works
+        minutes1 = 4;
+        hours1 += 1;
+      }
+      Serial.print("Snooze hours : ");
+      Serial.print(hours1);
+      Serial.print("Snooze minutes : ");
+      Serial.print(minutes1);
+      snooze = 0;
+    }
+
+    //Serial.println("Checkpoint");
+    if (mute == 1) {
+      //Serial.print(mute);
+      digitalWrite(52, HIGH);  // Find out how to make this work?!
+      digitalWrite(53, LOW);
+      mute = 0;
+      alarm_off = true;        // nessecary to ensure the alarm can't keep going off
+      lcd.clear();             // clears the display from the alarm being set
+      lcd.print("Morning Sunshine!"); // display fun message for one second
+      delay(1000);
+      lcd.clear();
+      Serial.print("muted");
+>>>>>>> Stashed changes
     }
   }
 }
