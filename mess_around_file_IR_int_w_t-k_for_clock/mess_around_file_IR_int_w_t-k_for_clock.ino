@@ -425,13 +425,13 @@ void Alarm_Set() {
       lcd.clear();
       count1 = -1;  // nessecary to prevent setting first variable for time
       count = 0;    // I think this is needed to make the alarm not count up and store variables
-      alarm_off = true; // so alarm can't go off after pressing the mute button
+      alarm_off = true; // so alarm can't go off after pressing the mute button (took so long to find this issue)
       lcd.setCursor(0, 0);
       lcd.print("timeset");
       break;
     }
 
-    else if (pressed == 1) {  // if pressed == 1
+    else if (pressed == 1) {  // if pressed == 1 (the else if I beleive is nessecary)
       pressed = 0;       // reset pressed = 0
       count += 1;  // increases the count by 1
       Serial.print("alarm count : ");
@@ -523,21 +523,45 @@ void Time_Set() {
 
   if (count1 == 1) {      // when a number is pressed
     h4 = number_pressed;  // set the hour 4 variable to number pressed
+    lcd.setCursor(10, 0);
+    lcd.print(":");
+    lcd.setCursor(13, 0);
+    lcd.print(":");
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
   }
 
   if (count1 == 2) {                         // when a number pressed = 2
     h5 = number_pressed;                     // set the hour 5 variable to number pressed
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
+    lcd.setCursor(9, 0);  // printing second digit of time set
+    lcd.print(h5);
     h6 = (String(h4) + String(h5)).toInt();  // adds the two number inputed as strings and convert them to an integer.
-    h4 = "";                                 // reset h4 to an empty string
-    h5 = "";                                 // reset h5 to an empty string
   }
 
   if (count1 == 3) {      //if count = 3
     m4 = number_pressed;  // minutes 4 = number pressed
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
+    lcd.setCursor(9, 0);  // printing second digit of time set
+    lcd.print(h5);
+    lcd.setCursor(11, 0); // printing third digit of time set
+    lcd.print(m4);
+    h4 = "";                                 // reset h4 to an empty string
+    h5 = "";                                 // reset h5 to an empty string
   }
 
   if (count1 == 4) {                         // if count = 4
     m5 = number_pressed;                     // m5 = numbers pressed
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
+    lcd.setCursor(9, 0);  // printing second digit of time set
+    lcd.print(h5);
+    lcd.setCursor(11, 0); // printing third digit of time set
+    lcd.print(m4);
+    lcd.setCursor(12, 0); // printing third digit of time set
+    lcd.print(m5);
     m6 = (String(m4) + String(m5)).toInt();  // adds the two number inputed as strings and convert them to an integer.
     m4 = "";                                 // reset m4 to an empty string
     m5 = "";                                 // reset h5 to an empty string
@@ -545,10 +569,33 @@ void Time_Set() {
 
   if (count1 == 5) {      // if count = 5
     s1 = number_pressed;  // seconds 1 = number pressed.
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
+    lcd.setCursor(9, 0);  // printing second digit of time set
+    lcd.print(h5);
+    lcd.setCursor(11, 0); // printing third digit of time set
+    lcd.print(m4);
+    lcd.setCursor(12, 0); // printing third digit of time set
+    lcd.print(m5);
+    lcd.setCursor(14, 0); // printing fourth digit of time set
+    lcd.print(s1);
   }
 
   if (count1 == 6) {                         // if count = 6
     s2 = number_pressed;                     // seconds 2 = number pressed
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
+    lcd.setCursor(9, 0);  // printing second digit of time set
+    lcd.print(h5);
+    lcd.setCursor(11, 0); // printing third digit of time set
+    lcd.print(m4);
+    lcd.setCursor(12, 0); // printing third digit of time set
+    lcd.print(m5);
+    lcd.setCursor(14, 0); // printing fourth digit of time set
+    lcd.print(s1);
+    lcd.setCursor(15, 0); // printing fifth and last digit of time set
+    lcd.print(s2);
+    lcd.clear();
     s3 = (String(s1) + String(s2)).toInt();  // adds the two number inputed as strings and convert them to an integer.
     s1 = "";                                 // resets seconds to an empty string
     s2 = "";                                 // resets seconds to an empty string
