@@ -2,10 +2,10 @@
 #include <DIYables_IRcontroller.h>  // DIYables_IRcontroller library
 #include <LiquidCrystal.h>
 #include "pitches.h"
+#include <NewTone.h>
 #define REST 0
 #define BUZZER_PIN 9
 #define IR_RECEIVER_PIN 7  // The Arduino pin connected to IR controller
-
 
 DIYables_IRcontroller_21 irController(IR_RECEIVER_PIN, 200);  // debounce time is 200ms
 
@@ -225,15 +225,15 @@ void IRController() {  //Function for the IR controller used from libary.
         break;
 
       case Key21::KEY_CH:
-        //Serial.println("CH"); // This is the mode button
+        Serial.println("CH");  // This is the mode button
         pressed = 1;
         mode = 1;
-        cancel += 1;
+        cancel += "1";
         break;
 
       case Key21::KEY_CH_PLUS:
         // This is the mute button
-        Serial.print("IR works: mute");
+        //Serial.print("IR works: mute");
         // pressed = 1; not nessecary gets rid of potential errors
         mute = 1;
         break;
@@ -411,44 +411,76 @@ void Time_Increment_AND_LCD_Format() {
 }
 
 void Alarm_Set() {
+
   while (mode == 1) {  // if mode button is pressed join the while loop.
+
     IRController();    // So it can work to set alarm
     lcd.setCursor(0, 0);
     lcd.println("Set Alarm hhmm");  // print set alarm in format hhmm
     alarm_off = false;              // make sure alarm can go off again
 
-    if ((cancel == "11") || (cancel == "111") || (cancel == "111") || (cancel == "1111") || (cancel == "11111")) {  // this allows canceling out of alarm set mode by pressing mode again
+    if ((cancel >= "11")) {  // this allows canceling out of alarm set mode by pressing mode again
       cancel = "";
       mode = 0;
       lcd.clear();
       count1 = -1;  // nessecary to prevent setting first variable for time
       count = 0;    // I think this is needed to make the alarm not count up and store variables
+      alarm_off = true; // so alarm can't go off after pressing the mute button (took so long to find this issue)
+      lcd.setCursor(0, 0);
+      lcd.print("timeset");
       break;
     }
 
-    if (pressed == 1) {  // if pressed == 1
+    else if (pressed == 1) {  // if pressed == 1 (the else if I beleive is nessecary)
       pressed = 0;       // reset pressed = 0
-      count += 1;        // increases the count by 1
+      count += 1;  // increases the count by 1
       Serial.print("alarm count : ");
       Serial.println(count);
+      lcd.clear();          // this is to clear the alarm each time a new one is set
+      lcd.setCursor(2, 1);  // alarm set formating to inform user to what they entered as the alarm in real-time
+      lcd.print(":");
+      lcd.setCursor(5, 1);
+      lcd.print(":");
+      lcd.setCursor(6, 1);
+      lcd.print("00");
 
       if (count == 2) {       // when the count = 2
         h1 = number_pressed;  // h1 = the first digit for the hours = the number pressed
+        lcd.setCursor(0, 1);  // printing first digit of alarm set
+        lcd.print(h1);
       }
 
-      if (count == 3) {                          // when the count = 3
-        h2 = number_pressed;                     // h2 = the second digit for hours = the number pressed
+      if (count == 3) {       // when the count = 3
+        h2 = number_pressed;  // h2 = the second digit for hours = the number pressed
+        lcd.setCursor(0, 1);  // printing first digit of alarm set
+        lcd.print(h1);
+        lcd.setCursor(1, 1);  // printing second digit of alarm set
+        lcd.print(h2);
         h3 = (String(h1) + String(h2)).toInt();  // adds the two number inputed as strings and convert them to an integer.
-        h1 = "";                                 // Resets h1 to an empty string.
-        h2 = "";                                 // Resets h2 to an empty string.
       }
 
       if (count == 4) {       // when count = 4
         m1 = number_pressed;  // m1 = the number pressed. Stores as a varible
+        lcd.setCursor(0, 1);  // printing first digit of alarm set
+        lcd.print(h1);
+        lcd.setCursor(1, 1);  // printing second digit of alarm set
+        lcd.print(h2);
+        lcd.setCursor(3, 1);  // printing thrid digit of alarm set
+        lcd.print(m1);
+        h1 = "";  // Resets h1 to an empty string.
+        h2 = "";  // Resets h2 to an empty string.
       }
 
-      if (count == 5) {                          // when count = 5
-        m2 = number_pressed;                     // m2 = the number pressed. Stores as a varible
+      if (count == 5) {       // when count = 5
+        m2 = number_pressed;  // m2 = the number pressed. Stores as a varible
+        lcd.setCursor(0, 1);  // printing first digit of alarm set
+        lcd.print(h1);
+        lcd.setCursor(1, 1);  // printing second digit of alarm set
+        lcd.print(h2);
+        lcd.setCursor(3, 1);  // printing thrid digit of alarm set
+        lcd.print(m1);
+        lcd.setCursor(4, 1);  // printing fourth digit of alarm set
+        lcd.print(m2);
         m3 = (String(m1) + String(m2)).toInt();  // adds the two number inputed as strings and convert them to an integer
         m1 = "";                                 // resets to an empty string
         m2 = "";                                 // resets to an empty string
@@ -456,7 +488,7 @@ void Alarm_Set() {
         minutes1 = constrain(m3, 0, 59);         // constrains minutes through 0-23. Reformats if out of constraints
         lcd.setCursor(0, 0);
         lcd.print("Alarm Set");
-        count = -1;   // reset count
+        count = 0;    // reset count changed this from -1
         pressed = 0;  // reset pressed to zero
         mode = 0;     // reset mode to zero
         count1 = -1;  // nessecary to prevent setting time varaible one
@@ -466,7 +498,7 @@ void Alarm_Set() {
         Serial.print("alarm minutes : ");
         Serial.println(minutes1);
 
-        lcd.setCursor(9, 1); // display set alarm to lcd
+        lcd.setCursor(9, 1);  // display set alarm to lcd
         lcd.print("h");
         lcd.setCursor(10, 1);
         lcd.print(hours1);
@@ -492,21 +524,45 @@ void Time_Set() {
 
   if (count1 == 1) {      // when a number is pressed
     h4 = number_pressed;  // set the hour 4 variable to number pressed
+    lcd.setCursor(10, 0);
+    lcd.print(":");
+    lcd.setCursor(13, 0);
+    lcd.print(":");
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
   }
 
   if (count1 == 2) {                         // when a number pressed = 2
     h5 = number_pressed;                     // set the hour 5 variable to number pressed
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
+    lcd.setCursor(9, 0);  // printing second digit of time set
+    lcd.print(h5);
     h6 = (String(h4) + String(h5)).toInt();  // adds the two number inputed as strings and convert them to an integer.
-    h4 = "";                                 // reset h4 to an empty string
-    h5 = "";                                 // reset h5 to an empty string
   }
 
   if (count1 == 3) {      //if count = 3
     m4 = number_pressed;  // minutes 4 = number pressed
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
+    lcd.setCursor(9, 0);  // printing second digit of time set
+    lcd.print(h5);
+    lcd.setCursor(11, 0); // printing third digit of time set
+    lcd.print(m4);
+    h4 = "";                                 // reset h4 to an empty string
+    h5 = "";                                 // reset h5 to an empty string
   }
 
   if (count1 == 4) {                         // if count = 4
     m5 = number_pressed;                     // m5 = numbers pressed
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
+    lcd.setCursor(9, 0);  // printing second digit of time set
+    lcd.print(h5);
+    lcd.setCursor(11, 0); // printing third digit of time set
+    lcd.print(m4);
+    lcd.setCursor(12, 0); // printing third digit of time set
+    lcd.print(m5);
     m6 = (String(m4) + String(m5)).toInt();  // adds the two number inputed as strings and convert them to an integer.
     m4 = "";                                 // reset m4 to an empty string
     m5 = "";                                 // reset h5 to an empty string
@@ -514,10 +570,33 @@ void Time_Set() {
 
   if (count1 == 5) {      // if count = 5
     s1 = number_pressed;  // seconds 1 = number pressed.
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
+    lcd.setCursor(9, 0);  // printing second digit of time set
+    lcd.print(h5);
+    lcd.setCursor(11, 0); // printing third digit of time set
+    lcd.print(m4);
+    lcd.setCursor(12, 0); // printing third digit of time set
+    lcd.print(m5);
+    lcd.setCursor(14, 0); // printing fourth digit of time set
+    lcd.print(s1);
   }
 
   if (count1 == 6) {                         // if count = 6
     s2 = number_pressed;                     // seconds 2 = number pressed
+    lcd.setCursor(8, 0);  // printing first digit of time set
+    lcd.print(h4);
+    lcd.setCursor(9, 0);  // printing second digit of time set
+    lcd.print(h5);
+    lcd.setCursor(11, 0); // printing third digit of time set
+    lcd.print(m4);
+    lcd.setCursor(12, 0); // printing third digit of time set
+    lcd.print(m5);
+    lcd.setCursor(14, 0); // printing fourth digit of time set
+    lcd.print(s1);
+    lcd.setCursor(15, 0); // printing fifth and last digit of time set
+    lcd.print(s2);
+    lcd.clear();
     s3 = (String(s1) + String(s2)).toInt();  // adds the two number inputed as strings and convert them to an integer.
     s1 = "";                                 // resets seconds to an empty string
     s2 = "";                                 // resets seconds to an empty string
@@ -539,6 +618,7 @@ void Time_Set() {
 
 void Alarm_Tone() {
   int size = sizeof(durations) / sizeof(int);
+<<<<<<< HEAD
   
   for (int note = 0; note < size; note++) { // needs for loop for song
 =======
@@ -554,17 +634,27 @@ void Alarm_Tone() {
     int size = sizeof(durations) / sizeof(int);
     for (int note = 0; note < size; note++) {
 >>>>>>> Stashed changes
+=======
+
+  for (int note = 0; note < size && (mute != 1); note++) {  // needs for loop for song
+    IRController();
+    if ((mute == 1) || (snooze == 1)) {  // To break out of song if mute or snooze is pressed
+      break;
+      alarm_off = true;
+    }
+>>>>>>> 7b891768acacb9f8fc757b9347eaf2cb6b8cd41c
     //to calculate the note duration, take one second divided by the note type.
     //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
     int duration = 1000 / durations[note];
-    tone(BUZZER_PIN, melody[note], duration);
+    NewTone(BUZZER_PIN, melody[note], duration);
 
     //to distinguish the notes, set a minimum time between them.
     //the note's duration + 30% seems to work well:
     int pauseBetweenNotes = duration * 1.30;
     delay(pauseBetweenNotes);
-    
+
     //stop the tone playing:
+<<<<<<< HEAD
     noTone(BUZZER_PIN);
 <<<<<<< Updated upstream
     if (alarm_off) {
@@ -635,6 +725,9 @@ void Alarm_Tone() {
       Serial.print("muted");
 >>>>>>> Stashed changes
     }
+=======
+    noNewTone(BUZZER_PIN);
+>>>>>>> 7b891768acacb9f8fc757b9347eaf2cb6b8cd41c
   }
 }
 
@@ -742,8 +835,6 @@ long HSBtoRGB(float _hue, float _sat, float _brightness) {
 void Snooze() {
   if (snooze == 1) {  // snooze feature!
     Serial.print("SNOOZE");
-    // digitalWrite(52, HIGH);  // Turn off
-    // digitalWrite(53, LOW);
     analogWrite(BUZZER_PIN, 0);  // for speaker off
 
     if (minutes1 <= 54) {
@@ -786,7 +877,6 @@ void Snooze() {
 
 void Mute() {
   if (mute == 1) {
-    //Serial.print(mute);
     analogWrite(BUZZER_PIN, 0);  // for speaker off
     mute = 0;
     alarm_off = true;                // nessecary to ensure the alarm can't keep going off
@@ -811,10 +901,6 @@ void setup() {
   delay(500);
   lcd.clear();
   pinMode(IR_RECEIVER_PIN, INPUT);
-  // pinMode(52, OUTPUT);  // defining buzzer signal pins
-  // pinMode(53, OUTPUT);
-  // digitalWrite(52, HIGH);  // defaulting them to off (*this can change depending on model of buzzer)
-  // digitalWrite(53, LOW);
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(PIN_RED, OUTPUT);  // RGB pins defined
   pinMode(PIN_BLUE, OUTPUT);
@@ -822,31 +908,33 @@ void setup() {
 }
 
 void loop() {
-  unsigned long currentMillis1 = millis(); // makes it so condition in second if statement can be evaluated
-  IRController();  // Call the IR control function
+  unsigned long currentMillis1 = millis();  // makes it so condition in second if statement can be evaluated
+  IRController();                           // Call the IR control function
   Time_Increment_AND_LCD_Format();
-
   if (pressed == 1) {  // If a button is pressed on the IR remote pressed == 1.
+    Serial.print("check point");
+    Serial.println("\t");
+    Serial.print("Mode:");
+    Serial.println(mode);
     Alarm_Set();
     Time_Set();
   }
 
-  if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis1 > 60000) && (alarm_off == false)) {  // so alarm does't go off right away (*alarm can never go off in less than a minute)
-    // unsigned long hold = millis() + 10000;
+  if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis1 > 60000) && (alarm_off == false)) {  // change 0 back to 60000 // so alarm does't go off right away (*alarm can never go off in less than a minute)
+    // unsigned long hold = millis() + 10000; // if you want to change how long the alarm plays if nothing is pressed
     // Serial.println(hold);
     // Serial.println(millis());
     // if (millis() >= hold) {
     //   alarm_off = true;
     // }
     Alarm_Tone();
-    RGB_Color_Changer();
+    //RGB_Color_Changer();
     Snooze();
-    //Serial.println("Checkpoint");
-    // Serial.println(mute);
     Mute();
-  } else {
-    pinMode(PIN_RED, 0);  // RGB pins off
-    pinMode(PIN_BLUE, 0);
-    pinMode(PIN_GREEN, 0);
-  }
+  } //else {
+  //   analogWrite(PIN_RED, 0);  // RGB pins off
+  //   analogWrite(PIN_BLUE, 0);
+  //   analogWrite(PIN_GREEN, 0);
+  //   Serial.print("here");
+  // }
 }
