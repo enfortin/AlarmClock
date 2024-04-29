@@ -18,6 +18,7 @@ int hours1, minutes1;
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 unsigned long previousMillis;
+unsigned long snoozeEndTime = 0;
 const unsigned long interval = 1000;  // 1 second
 String h1, h2, h4, h5, m1, m2, m4, m5, s1, s2;
 int h3, h6, m3, m6, s3;
@@ -697,51 +698,55 @@ void Snooze() {
   if (snooze == 1) {  // snooze feature!
     Serial.print("SNOOZE");
     analogWrite(BUZZER_PIN, 0);  // for speaker off
-
+    int mins;
+    int hrs;
+    // if statments just to print to lcd mins and hrs
     if (minutes1 <= 54) {
-      minutes1 += 5;  // adds 5 minutes to alarm
+      mins = minutes1 + 5;
+      hrs = hours1;
     }
 
-    else if (minutes1 == 55) {  // works
-      minutes1 = 0;
-      hours1 += 1;
-      Serial.print(minutes1);
-      Serial.print(hours1);
+    else if (minutes1 == 55) {
+      mins = 0;
+      hrs = hours1 + 1;
     }
 
-    else if (minutes1 == 56) {  // works
-      minutes1 = 1;
-      hours1 += 1;
+    else if (minutes1 == 56) {
+      mins = 1;
+      hrs = hours1 + 1;
     }
 
-    else if (minutes1 == 57) {  // doesn't work the alarm is instantly muted before snooze press?????????????? pressing mode makes it go off????????????
-      minutes1 = 2;
-      hours += 1;
+    else if (minutes1 == 57) {
+      mins = 2;
+      hrs = hours1 + 1;
     }
 
-    else if (minutes1 == 58) {  // alarm is instantly muted before snooze press??????????????????????????????? pressing mode makes it go off??????????????
-      minutes1 = 3;
-      hours1 += 1;
+    else if (minutes1 == 58) {
+      mins = 3;
+      hrs = hours1 + 1;
     }
 
-    else if (minutes1 == 59) {  // works
-      minutes1 = 4;
-      hours1 += 1;
+    else if (minutes1 == 59) {
+      mins = 4;
+      hrs = hours1 + 1;
     }
     snooze = 0;
+    snoozeEndTime = millis() + 300000; // current time + 5 mins
+  
+    lcd.clear();
     lcd.setCursor(9, 1);  // display set alarm to lcd
     lcd.print("h");
     lcd.setCursor(10, 1);
-    lcd.print(hours1);
+    lcd.print(hrs);
     lcd.setCursor(13, 1);
     lcd.print("m");
     lcd.setCursor(14, 1);
-    lcd.print(minutes1);
+    lcd.print(mins);
 
     Serial.print("Snooze hours : ");
-    Serial.print(hours1);
+    Serial.print(hrs);
     Serial.print("Snooze minutes : ");
-    Serial.print(minutes1);
+    Serial.print(mins);
   }
 }
 
@@ -792,5 +797,12 @@ void loop() {
     Alarm_Tone();
     Snooze();
     Mute();
-  } 
+  }
+
+  if (snoozeEndTime > 0 && millis() >= snoozeEndTime) { // simple idea works however not extremely accurate
+    snoozeEndTime = 0;
+    alarm_off = false;
+    Alarm_Tone();
+    Mute();
+  }
 }
