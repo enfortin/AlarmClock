@@ -615,7 +615,7 @@ void Time_Set() {
   pressed = 0;
 }
 
-void Alarm_Tone() {
+void Alarm_Tone_and_RGB_Light_Show() {
   int size = sizeof(durations) / sizeof(int);
   unsigned long hold = millis() + 60000; // if you want to change how long the alarm plays if nothing is pressed
 
@@ -787,22 +787,22 @@ void setup() {
 void loop() {
   unsigned long currentMillis1 = millis();  // makes it so condition in second if statement can be evaluated
   IRController();                           // Call the IR control function
-  Time_Increment_AND_LCD_Format();
+  Time_Increment_AND_LCD_Format();          // increment seconds and updates lcd
   if (pressed == 1) {  // If a button is pressed on the IR remote pressed == 1.
-    Alarm_Set();
-    Time_Set();
+    Alarm_Set(); // sets alarm
+    Time_Set(); // sets time
   }
 
-  if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis1 > 60000) && (alarm_off == false)) {  // change 0 back to 60000 // so alarm does't go off right away (*alarm can never go off in less than a minute)
-    Alarm_Tone();
-    Snooze();
-    Mute();
+  if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis1 > 60000) && (alarm_off == false)) {  // so alarm does't go off right away (*alarm can never go off in less than a minute)
+    Alarm_Tone_and_RGB_Light_Show(); // alarm sound + light show
+    Snooze(); // snoozes alarm for 
+    Mute();  // turns off alarm
   }
 
   if (snoozeEndTime > 0 && millis() >= snoozeEndTime) { // simple idea works however not extremely accurate
-    snoozeEndTime = 0;
-    alarm_off = false;
-    Alarm_Tone();
-    Mute();
+    snoozeEndTime = 0; // resets the snooze flag
+    alarm_off = false; // makes sure the alarm can turn off
+    Alarm_Tone_and_RGB_Light_Show(); // sounds alarm
+    lcd.clear(); // clears the alarm set time from the display
   }
 }
