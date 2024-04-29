@@ -625,7 +625,7 @@ void Alarm_Tone() {
 
     // convert notes values to work with case statememts
     int color_segment = hue / 5; // 30/6 gives 5 which gives 6 case statements
-    int remainder = (hue - hue) * 6; // *6 to get it in terms of analog values and find its place in the range of values
+    int remainder = (hue - hue) * 6; // *6 to get it in terms of analog values and find its value compared to the range
 
     switch (color_segment) { // red
       case 0:
