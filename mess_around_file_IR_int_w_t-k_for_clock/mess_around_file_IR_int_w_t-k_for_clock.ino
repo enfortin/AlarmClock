@@ -27,12 +27,14 @@ String cancel;
 int snooze = 0;
 bool stop_playing = 0;
 int note;
+int Red, Green, Blue;
+int color;
 
 // Rainbow color changing RGB leds example
 // I am using common cathode RGB leds
-int PIN_RED = 10;
-int PIN_GREEN = 8;
-int PIN_BLUE = 6;
+int PIN_RED = 44;
+int PIN_GREEN = 46;
+int PIN_BLUE = 45;
 int counter = 0;
 
 // Number of colors used for animating, higher = smoother and slower animation)
@@ -221,7 +223,6 @@ void IRController() {  //Function for the IR controller used from libary.
 
       case Key21::KEY_CH_MINUS:
         Serial.println("CH-");
-        pressed = 1;
         break;
 
       case Key21::KEY_CH:
@@ -233,14 +234,11 @@ void IRController() {  //Function for the IR controller used from libary.
 
       case Key21::KEY_CH_PLUS:
         // This is the mute button
-        //Serial.print("IR works: mute");
-        // pressed = 1; not nessecary gets rid of potential errors
         mute = 1;
         break;
 
       case Key21::KEY_PREV:
         //Serial.println(">||"); // this button will snooze for 5 mins! Setting alarm five minutes out!
-        Serial.print("IR works");
         snooze = 1;
         break;
 
@@ -595,7 +593,7 @@ void Time_Set() {
     lcd.print(s1);
     lcd.setCursor(15, 0); // printing fifth and last digit of time set
     lcd.print(s2);
-    lcd.clear();
+    lcd.clear();          // to clear time set from lcd
     s3 = (String(s1) + String(s2)).toInt();  // adds the two number inputed as strings and convert them to an integer.
     s1 = "";                                 // resets seconds to an empty string
     s2 = "";                                 // resets seconds to an empty string
@@ -610,6 +608,7 @@ void Time_Set() {
     Serial.println(minutes);
     Serial.print("set time seconds : ");
     Serial.println(seconds);
+    lcd.print("timeset");
   }
   number_pressed = "";  // think about this
   pressed = 0;
@@ -617,18 +616,67 @@ void Time_Set() {
 
 void Alarm_Tone() {
   int size = sizeof(durations) / sizeof(int);
+  unsigned long hold = millis() + 60000; // if you want to change how long the alarm plays if nothing is pressed
 
   for (int note = 0; note < size && (mute != 1); note++) {  // needs for loop for song
+    
+    // Calculate hue value based on the note index
+    int hue = map(note, 30, size, 0, 255);
+
+    // convert notes values to work with case statememts
+    int color_segment = hue / 5; // 30/6 gives 5 which gives 6 case statements
+    int remainder = (hue - hue) * 6; // *6 to get it in terms of analog values and find its place in the range of values
+
+    switch (color_segment) { // red
+      case 0:
+        Red = 255;
+        Green = remainder; // goes into yellow next so want to add some value to green
+        Blue = 0;
+        break;
+      case 1: // yellow 1:1 ratio
+        Red = 255;
+        Green = 255;
+        Blue = 0;
+        break;
+      case 2: // green
+        Red = 0;
+        Green = 255;
+        Blue = remainder; // b/c goes to cyan next
+        break;
+      case 3: // cyan = green:blue = 1:1
+        Red = 0;
+        Green = 255;
+        Blue = 255;
+        break;
+      case 4: // blue
+        Red = remainder;
+        Green = 0;
+        Blue = 255;
+        break;
+      default: // magenta
+        Red = 255;
+        Green = 0;
+        Blue = 255;
+        break;
+    }
+
     IRController();
-    if ((mute == 1) || (snooze == 1)) {  // To break out of song if mute or snooze is pressed
-      break;
+    if (millis() >= hold) { // to turn off alarm after default period of time
       alarm_off = true;
+      setColor(0, 0, 0);
+      break;
+    }
+    if ((mute == 1) || (snooze == 1)) {  // To break out of song if mute or snooze is pressed
+      alarm_off = true;
+      setColor(0, 0, 0);
+      break;
     }
     //to calculate the note duration, take one second divided by the note type.
     //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
     int duration = 1000 / durations[note];
     NewTone(BUZZER_PIN, melody[note], duration);
-
+    setColor(Red, Green, Blue);
+    //setColor(thing*2, thing*3, thing*4);
     //to distinguish the notes, set a minimum time between them.
     //the note's duration + 30% seems to work well:
     int pauseBetweenNotes = duration * 1.30;
@@ -639,105 +687,10 @@ void Alarm_Tone() {
   }
 }
 
-void RGB_Color_Changer() {
-  float colorNumber = counter > numColors ? counter - numColors : counter;
-
-  // Play with the saturation and brightness values
-  // to see what they do
-  float saturation = 1;                                // Between 0 and 1 (0 = gray, 1 = full color)
-  float brightness = .05;                              // Between 0 and 1 (0 = dark, 1 is full brightness)
-  float hue = (colorNumber / float(numColors)) * 360;  // Number between 0 and 360
-  long color = HSBtoRGB(hue, saturation, brightness);
-
-  // Get the red, blue and green parts from generated color
-  int red = color >> 16 & 255;
-  int green = color >> 8 & 255;
-  int blue = color & 255;
-  setColor(red, green, blue);
-
-  // Counter can never be greater then 2 times the number of available colors
-  // the colorNumber = line above takes care of counting backwards (nicely looping animation)
-  // when counter is larger then the number of available colors
-  counter = (counter + 1) % (numColors * 2);
-
-  // If you uncomment this line the color changing starts from the
-  // beginning when it reaches the end (animation only plays forward)
-  // counter = (counter + 1) % (numColors);
-
-  delay(animationDelay);
-}
-
-void setColor(unsigned char red, unsigned char green, unsigned char blue) {
+void setColor(uint8_t red, uint8_t green, uint8_t blue) {
   analogWrite(PIN_RED, red);
   analogWrite(PIN_GREEN, green);
   analogWrite(PIN_BLUE, blue);
-}
-
-long HSBtoRGB(float _hue, float _sat, float _brightness) {
-  float red = 0.0;
-  float green = 0.0;
-  float blue = 0.0;
-
-  if (_sat == 0.0) {
-    red = _brightness;
-    green = _brightness;
-    blue = _brightness;
-  } else {
-    if (_hue == 360.0) {
-      _hue = 0;
-    }
-
-    int slice = _hue / 60.0;
-    float hue_frac = (_hue / 60.0) - slice;
-
-    float aa = _brightness * (1.0 - _sat);
-    float bb = _brightness * (1.0 - _sat * hue_frac);
-    float cc = _brightness * (1.0 - _sat * (1.0 - hue_frac));
-
-    switch (slice) {
-      case 0:
-        red = _brightness;
-        green = cc;
-        blue = aa;
-        break;
-      case 1:
-        red = bb;
-        green = _brightness;
-        blue = aa;
-        break;
-      case 2:
-        red = aa;
-        green = _brightness;
-        blue = cc;
-        break;
-      case 3:
-        red = aa;
-        green = bb;
-        blue = _brightness;
-        break;
-      case 4:
-        red = cc;
-        green = aa;
-        blue = _brightness;
-        break;
-      case 5:
-        red = _brightness;
-        green = aa;
-        blue = bb;
-        break;
-      default:
-        red = 0.0;
-        green = 0.0;
-        blue = 0.0;
-        break;
-    }
-  }
-
-  long ired = red * 255.0;
-  long igreen = green * 255.0;
-  long iblue = blue * 255.0;
-
-  return long((ired << 16) | (igreen << 8) | (iblue));
 }
 
 void Snooze() {
@@ -775,11 +728,20 @@ void Snooze() {
       minutes1 = 4;
       hours1 += 1;
     }
+    snooze = 0;
+    lcd.setCursor(9, 1);  // display set alarm to lcd
+    lcd.print("h");
+    lcd.setCursor(10, 1);
+    lcd.print(hours1);
+    lcd.setCursor(13, 1);
+    lcd.print("m");
+    lcd.setCursor(14, 1);
+    lcd.print(minutes1);
+
     Serial.print("Snooze hours : ");
     Serial.print(hours1);
     Serial.print("Snooze minutes : ");
     Serial.print(minutes1);
-    snooze = 0;
   }
 }
 
@@ -808,6 +770,8 @@ void setup() {
   lcd.print("hh:mm:ss format");  // formatting the
   delay(500);
   lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("timeset");
   pinMode(IR_RECEIVER_PIN, INPUT);
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(PIN_RED, OUTPUT);  // RGB pins defined
@@ -820,29 +784,13 @@ void loop() {
   IRController();                           // Call the IR control function
   Time_Increment_AND_LCD_Format();
   if (pressed == 1) {  // If a button is pressed on the IR remote pressed == 1.
-    Serial.print("check point");
-    Serial.println("\t");
-    Serial.print("Mode:");
-    Serial.println(mode);
     Alarm_Set();
     Time_Set();
   }
 
   if ((hours1 == hours) && (minutes1 == minutes) && (currentMillis1 > 60000) && (alarm_off == false)) {  // change 0 back to 60000 // so alarm does't go off right away (*alarm can never go off in less than a minute)
-    // unsigned long hold = millis() + 10000; // if you want to change how long the alarm plays if nothing is pressed
-    // Serial.println(hold);
-    // Serial.println(millis());
-    // if (millis() >= hold) {
-    //   alarm_off = true;
-    // }
     Alarm_Tone();
-    //RGB_Color_Changer();
     Snooze();
     Mute();
-  } //else {
-  //   analogWrite(PIN_RED, 0);  // RGB pins off
-  //   analogWrite(PIN_BLUE, 0);
-  //   analogWrite(PIN_GREEN, 0);
-  //   Serial.print("here");
-  // }
+  } 
 }
