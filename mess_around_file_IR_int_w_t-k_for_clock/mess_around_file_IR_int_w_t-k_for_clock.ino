@@ -719,28 +719,48 @@ void Snooze() {
     }
 
     else if (minutes1 == 55) {
+      if(hours1 == 23) {
+        hrs = 0;
+      } else {
+        hrs = hours1 + 1;
+      }
       mins = 0;
-      hrs = hours1 + 1;
     }
 
     else if (minutes1 == 56) {
+      if(hours1 == 23) {
+        hrs = 0;
+      } else {
+        hrs = hours1 + 1;
+      }
       mins = 1;
-      hrs = hours1 + 1;
     }
 
     else if (minutes1 == 57) {
+      if(hours1 == 23) {
+        hrs = 0;
+      } else {
+        hrs = hours1 + 1;
+      }
       mins = 2;
-      hrs = hours1 + 1;
     }
 
     else if (minutes1 == 58) {
+      if(hours1 == 23) {
+        hrs = 0;
+      } else {
+        hrs = hours1 + 1;
+      }
       mins = 3;
-      hrs = hours1 + 1;
     }
 
     else if (minutes1 == 59) {
+      if(hours1 == 23) {
+        hrs = 0;
+      } else {
+        hrs = hours1 + 1;
+      }
       mins = 4;
-      hrs = hours1 + 1;
     }
     snooze = 0;
     snoozeEndTime = millis() + 300000; // current time + 5 mins
@@ -811,6 +831,9 @@ void loop() {
     Alarm_Tone_and_RGB_Light_Show(); // alarm sound + light show
     Snooze(); // snoozes alarm for 
     Mute();  // turns off alarm
+  } else {
+    mute = 0; // so clicking mute before does not mute the upcoming alarm instantly
+    snooze = 0; // so clicking snooze before does not snooze the upcoming alarm instantly
   }
 
   if (snoozeEndTime > 0 && millis() >= snoozeEndTime) { // simple idea works however not extremely accurate
