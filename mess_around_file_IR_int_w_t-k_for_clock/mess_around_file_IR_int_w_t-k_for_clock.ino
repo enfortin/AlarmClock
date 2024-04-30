@@ -30,6 +30,9 @@ bool stop_playing = 0;
 int note;
 int Red, Green, Blue;
 int color;
+bool alarm_set, alarm_went_off, out_of_snooze = false;
+
+
 
 // Rainbow color changing RGB leds example
 // I am using common cathode RGB leds
@@ -426,7 +429,7 @@ void Alarm_Set() {
       count = 0;    // I think this is needed to make the alarm not count up and store variables
       alarm_off = true; // so alarm can't go off after pressing the mute button (took so long to find this issue)
       lcd.setCursor(0, 0);
-      lcd.print("timeset");
+      lcd.print("Timeset");
       break;
     }
 
@@ -487,6 +490,7 @@ void Alarm_Set() {
         minutes1 = constrain(m3, 0, 59);         // constrains minutes through 0-23. Reformats if out of constraints
         lcd.setCursor(0, 0);
         lcd.print("Alarm Set");
+        alarm_set = true; // to display timeset if the user decides to set time after alarm is set
         count = 0;    // reset count changed this from -1
         pressed = 0;  // reset pressed to zero
         mode = 0;     // reset mode to zero
@@ -516,6 +520,14 @@ void Time_Set() {
   if (mode != 1) {  // add this in hopes that it will allow you to switch back a forth between modes with out storing variables
     count1 += 1;
     mode = 0;
+  }
+
+  if (alarm_set == true || alarm_went_off == true || out_of_snooze == true) { // to display timeset if the user decides to set time after alarm is set or enter time after alarm goes off
+    alarm_set = false;
+    alarm_went_off = false;
+    out_of_snooze = false;
+    lcd.setCursor(0, 0);
+    lcd.print("Timeset         "); // reformats lcd without using lcd.clear()
   }
   Serial.print("set time count : ");
   Serial.println(count1);
@@ -609,7 +621,7 @@ void Time_Set() {
     Serial.println(minutes);
     Serial.print("set time seconds : ");
     Serial.println(seconds);
-    lcd.print("timeset");
+    lcd.print("Timeset");
   }
   number_pressed = "";  // think about this
   pressed = 0;
@@ -734,6 +746,9 @@ void Snooze() {
     snoozeEndTime = millis() + 300000; // current time + 5 mins
   
     lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Alarm Set");
+    out_of_snooze = true;
     lcd.setCursor(9, 1);  // display set alarm to lcd
     lcd.print("h");
     lcd.setCursor(10, 1);
@@ -757,8 +772,7 @@ void Mute() {
     alarm_off = true;                // nessecary to ensure the alarm can't keep going off
     lcd.clear();                     // clears the display from the alarm being set
     lcd.print("Morning Sunshine!");  // display fun message for one second
-    delay(1000);
-    lcd.clear();
+    alarm_went_off = true;           // flag variable to clear Morning Sunshine
     Serial.print("muted");
   }
 }
@@ -776,7 +790,7 @@ void setup() {
   delay(500);
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("timeset");
+  lcd.print("Timeset");
   pinMode(IR_RECEIVER_PIN, INPUT);
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(PIN_RED, OUTPUT);  // RGB pins defined
@@ -804,5 +818,8 @@ void loop() {
     alarm_off = false; // makes sure the alarm can turn off
     Alarm_Tone_and_RGB_Light_Show(); // sounds alarm
     lcd.clear(); // clears the alarm set time from the display
+    lcd.setCursor(0, 0);
+    lcd.print("Morning Sunshine");
+    out_of_snooze = true;
   }
 }
